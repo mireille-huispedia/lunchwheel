@@ -56,6 +56,7 @@ export default {
       lunches: [],
       loading: true,
       canvasVerify: false,
+      useWeight: true,
       canvasOptions: {
         borderWidth: 2,
         borderColor: '#fff',
@@ -69,9 +70,6 @@ export default {
     }
   },
   methods: {
-    onImageRotateStart() {
-   
-    },
     onCanvasRotateStart(rotate) {
       if (this.canvasVerify) {
         const verified = true // true: the test passed the verification, false: the test failed the verification
@@ -99,7 +97,7 @@ export default {
     },
 
     getCategories() {
-      return axios.post('https://dev-cms.huispedia.nl/api', graphQuest, gqHeaders).then(result => {
+      return axios.post('https://cms.huispedia.nl/api', graphQuest, gqHeaders).then(result => {
         this.lunches = result.data.data.entries[0].wheelOfLunch;
       }).catch(error => {
         console.log(error);
@@ -108,14 +106,21 @@ export default {
   },
   async mounted () {
     await this.getCategories();
-    this.lunches = this.lunches.map(entry => {
+    let probability = Math.round(100 / this.lunches.length);
+    let total = 0;
+
+    this.lunches = this.lunches.map((entry, index) => {
+
+      if (index + 1 === this.lunches.length) probability = 100 - total;
+      else total = total + probability;
+      
       return {
         id: entry.id, 
         name: entry.lunchValue,
         value: entry.lunchValue, 
+        probability: probability,
         bgColor: entry.bgColor,
         color: entry.color,
-        probability: 100 / this.lunches.length,
         weight: 1,
         options: entry.options
       }
