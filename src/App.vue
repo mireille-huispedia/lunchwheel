@@ -44,7 +44,7 @@ export default {
   },
   mounted () {
     const myCanvas = document.createElement('canvas');
-    document.appendChild(myCanvas);
+    document.body.appendChild(myCanvas);
 
     this.confetti = confetti.create(myCanvas, {
       resize: true,

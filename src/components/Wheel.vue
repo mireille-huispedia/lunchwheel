@@ -20,15 +20,14 @@ import 'vue-fortune-wheel/lib/vue-fortune-wheel.css';
 
 const gqHeaders = {
   headers: {
-    'Content-Type': 'application/graphql'
+    'Content-Type': 'application/graphql',
+    'Authorization': 'Bearer ntKTH26EDqLBC5q21JeSt-45xvtenYxF'
   }
 }
 
 const graphQuest = `query MyQuery {
-  entries(site: "huispediaIntern") {
-    id
+  entry(site: "huispediaIntern", id: 1330) {
     ... on luxeLunch_luxeLunch_Entry {
-      id
       wheelOfLunch {
         ... on wheelOfLunch_BlockType {
           id
@@ -97,35 +96,38 @@ export default {
     },
 
     getCategories() {
-      return axios.post('https://cms.huispedia.nl/api', graphQuest, gqHeaders).then(result => {
-        this.lunches = result.data.data.entries[0].wheelOfLunch;
+      axios.post('https://cms.huispedia.nl/api', graphQuest, gqHeaders).then(result => {
+        console.log(result)
+        this.lunches = result.data.data.entry.wheelOfLunch;
+        console.log(result.data.data.entry)
+
+        let probability = Math.round(100 / this.lunches.length);
+        let total = 0;
+
+        this.lunches = this.lunches.map((entry, index) => {
+
+          if (index + 1 === this.lunches.length) probability = 100 - total;
+          else total = total + probability;
+          
+          return {
+            id: entry.id, 
+            name: entry.lunchValue,
+            value: entry.lunchValue, 
+            probability: probability,
+            bgColor: entry.bgColor,
+            color: entry.color,
+            weight: 1,
+            options: entry.options
+          }
+        })
+        this.loading = false;
       }).catch(error => {
         console.log(error);
       })
     }
   },
-  async mounted () {
-    await this.getCategories();
-    let probability = Math.round(100 / this.lunches.length);
-    let total = 0;
-
-    this.lunches = this.lunches.map((entry, index) => {
-
-      if (index + 1 === this.lunches.length) probability = 100 - total;
-      else total = total + probability;
-      
-      return {
-        id: entry.id, 
-        name: entry.lunchValue,
-        value: entry.lunchValue, 
-        probability: probability,
-        bgColor: entry.bgColor,
-        color: entry.color,
-        weight: 1,
-        options: entry.options
-      }
-    })
-    this.loading = false;
+  mounted () {
+    this.getCategories();
   },
 }
 </script>
