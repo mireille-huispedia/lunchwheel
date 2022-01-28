@@ -28,7 +28,9 @@ const gqHeaders = {
 const graphQuest = `query MyQuery {
   entry(site: "huispediaIntern", id: 1330) {
     ... on luxeLunch_luxeLunch_Entry {
+      body
       wheelOfLunch {
+        body
         ... on wheelOfLunch_BlockType {
           id
           color
@@ -99,7 +101,7 @@ export default {
       axios.post('https://cms.huispedia.nl/api', graphQuest, gqHeaders).then(result => {
         console.log(result)
         this.lunches = result.data.data.entry.wheelOfLunch;
-        console.log(result.data.data.entry)
+        this.$emit('update-body', result.data.data.entry.body);
 
         let probability = Math.round(100 / this.lunches.length);
         let total = 0;

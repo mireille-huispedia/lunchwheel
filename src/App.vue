@@ -6,7 +6,7 @@
       <h2>Wat gaat het deze maand worden?</h2>
     </div>
     <div id="fortune-wheel">
-      <wheel @rotate-end="setFood" />
+      <wheel @rotate-end="setFood" @update-body="updateBody" />
     </div>
     <div class="food" v-if="food.length && options.length">
       <span>{{ food }}</span>
@@ -14,7 +14,7 @@
         <a :href="option.optionLink" target="_blank" v-for="option in options" :key="option.optionTitle">{{ option.optionTitle }}</a>
       </nav>
     </div>
-    
+    <div v-html="body" class="previous-restaurants" v-show="body.length > 0"></div>
   </div>
 </template>
 
@@ -31,15 +31,18 @@ export default {
     return {
       food: '',
       options: [],
-      confetti: null
+      confetti: null,
+      body: ''
     }
   },
   methods: {
     setFood(val) {
-      console.log(val)
       this.food = val.value;
       this.options = val.options;
       confetti();
+    },
+    updateBody(body) {
+      this.body = body;
     }
   },
   mounted () {
@@ -123,4 +126,11 @@ $primary: #ff385c;
     display: block;
   }
 }
+
+  .previous-restaurants {
+    border: 1px solid #ddd;
+    padding: 2rem;
+    text-align: left;
+    margin-top: 2rem;
+  }
 </style>
